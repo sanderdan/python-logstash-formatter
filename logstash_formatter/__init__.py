@@ -100,10 +100,10 @@ class LogstashFormatter(logging.Formatter):
 
         logr = self.defaults.copy()
 
-        logr.update({'@message': msg,
-                     '@timestamp': datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-                     '@source_host': self.source_host,
-                     '@fields': self._build_fields(logr, fields)})
+        logr.update({'message': msg,
+                     'timestamp': datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+                     'source_host': self.source_host,
+                     'fields': self._build_fields(logr, fields)})
 
         return json.dumps(logr, default=self.json_default, cls=self.json_cls)
 
@@ -157,7 +157,7 @@ class LogstashFormatterV1(LogstashFormatter):
             except:
                 # in case we can not format the msg properly we log it as is instead of crashing
                 msg = msg
-            fields['message'] = msg
+            fields['log_msg'] = msg
 
         if 'exc_info' in fields:
             if fields['exc_info']:
@@ -169,9 +169,8 @@ class LogstashFormatterV1(LogstashFormatter):
             fields.pop('exc_text')
 
         now = datetime.datetime.utcnow()
-        base_log = {'@timestamp': now.strftime("%Y-%m-%dT%H:%M:%S") +
+        base_log = {'timestamp': now.strftime("%Y-%m-%dT%H:%M:%S") +
                     ".%03d" % (now.microsecond / 1000) + "Z",
-                    '@version': 1,
                     'source_host': self.source_host}
         base_log.update(fields)
 
